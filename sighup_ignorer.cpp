@@ -2,10 +2,15 @@
 #include <csignal>
 #include <unistd.h>
 
+enum Signal {
+    SIGHUP_SIGNAL,
+    SIGINT_SIGNAL
+};
+
 // Обработчик сигнала SIGHUP
 void sighup_handler(int signum) {
     // Вывод сообщения при получении сигнала SIGHUP
-    std::cout << "Ha-ha-ha I will ignore {SIGHUP} signal" << std::endl;
+    std::cout << "Ha-ha-ha I will ignore {signal " << Signal(signum) << "} signal" << std::endl;
 }
 
 int main() {
@@ -13,6 +18,13 @@ int main() {
     if (signal(SIGHUP, sighup_handler) == SIG_ERR) {
         // Обработка ошибки установки обработчика сигнала
         std::cerr << "Error setting up SIGHUP signal handler" << std::endl;
+        return 1;
+    }
+
+    // Установка пользовательского обработчика для сигнала SIGINT
+    if (signal(SIGINT, sighup_handler) == SIG_ERR) {
+        // Обработка ошибки установки обработчика сигнала
+        std::cerr << "Error setting up SIGINT signal handler" << std::endl;
         return 1;
     }
 
