@@ -30,23 +30,63 @@ int main(void){
     
     CELL *pointer = (&orange);
 
-    // Метод 1: Преобразование через reinterpret_cast
-    cout << "\nМетод 1 - Преобразование через reinterpret_cast:" << endl;
-    unsigned short rawValue = *reinterpret_cast<unsigned short*>(pointer);
-    cout << "Hex значение: 0x" << std::hex << std::uppercase << rawValue << std::dec << endl;
+    // Преобразование в unsigned short для битовых операций
+    unsigned short *rawValue = reinterpret_cast<unsigned short*>(pointer);
+
+    // Вывод исходного hex значения
+    cout << "\nИсходное hex значение: 0x" 
+         << std::hex << std::uppercase << *rawValue << std::dec << endl;
+
+    // Побайтовое представление для наглядности
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(pointer);
+    cout << "\nПобайтовое представление:" << endl;
+    cout << "Байт 1 (мл.): 0x" << std::hex << static_cast<int>(bytes[0]) << endl;
+    cout << "Байт 2 (ст.): 0x" << std::hex << static_cast<int>(bytes[1]) << std::dec << endl;
+
+    // Битовая операция OR для установки 6 и 7 бит ПЕРВОГО байта в 1
+    // Маска: 0b11000000 (0xC0)
+    bytes[0] |= 0xC0;
+
+    // Битовая операция AND для обнуления 6 и 3 бит ВТОРОГО байта
+    // Маска: 0b10111011 (0xBB)
+    bytes[1] &= 0xBB;
+
+    /*
+
+    Before OR:  [ABCDEFGH][IJKLMNOP]
+    OR Mask:    [11000000][--------]
+    After OR:   [11CDEFGH][IJKLMNOP]
+ 
+    Before AND: [--------][IJKLMNOP]
+    AND Mask:   [--------][10111011]
+    After AND:  [--------][I0KLM0OP]
+
+    */
+
+    // Вывод измененных байтов
+    cout << "\nИзмененные байты:" << endl;
+    cout << "Байт 1 (мл.): 0x" << std::hex << static_cast<int>(bytes[0]) << endl;
+    cout << "Байт 2 (ст.): 0x" << std::hex << static_cast<int>(bytes[1]) << std::dec << endl;
+
+    // Вывод hex значения для проверки
+//    unsigned short *rawValue = reinterpret_cast<unsigned short*>(pointer);
+    cout << "\nИзмененное hex значение: 0x" 
+         << std::hex << std::uppercase << *rawValue << std::dec << endl;
+
+    // Вывод измененных значений структуры
+    cout << "\nИзмененные значения структуры:" << endl;
+    cout << "orange.character = "  <<  orange.character << endl;
+    cout << "orange.foreground = " << orange.foreground << endl;
+    cout << "orange.intensity = "  << orange.intensity  << endl;
+    cout << "orange.background = " << orange.background << endl;
+    cout << "orange.blink = "      << orange.blink      << endl; 
 
     // Метод 2: Использование stringstream для точного форматирования
     cout << "\nМетод 2 - Преобразование через stringstream:" << endl;
     std::stringstream ss;
-    ss << std::hex << std::setw(4) << std::setfill('0') << rawValue;
+    ss << std::hex << std::setw(4) << std::setfill('0') << *rawValue;
     std::string formattedHex = ss.str();
     cout << "Форматированное hex значение: 0x" << formattedHex << endl;
-
-    // Метод 3: Побайтовое представление
-    cout << "\nМетод 3 - Побайтовое hex представление:" << endl;
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(pointer);
-    cout << "Байт 1 (мл.): 0x" << std::hex << static_cast<int>(bytes[0]) << endl;
-    cout << "Байт 2 (ст.): 0x" << std::hex << static_cast<int>(bytes[1]) << std::dec << endl;
 
     return 0;
 }
